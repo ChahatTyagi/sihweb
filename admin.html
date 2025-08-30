@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Admin Panel - Samadhan Kendra</title>
+	<link rel="stylesheet" href="styles.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+	<nav class="navbar">
+		<div class="nav-container">
+			<div class="nav-logo">
+				<a href="index.html">
+					<i class="fas fa-handshake"></i>
+					<span>Samadhan Kendra</span>
+				</a>
+			</div>
+			<ul class="nav-menu">
+				<li><a href="index.html" class="nav-link">Home</a></li>
+				<li><a href="#" class="nav-link active">Admin</a></li>
+			</ul>
+			<div class="nav-user">
+				<div class="user-avatar" onclick="toggleProfileMenu()">
+					<i class="fas fa-user-shield"></i>
+				</div>
+				<div class="profile-dropdown" id="profileDropdown">
+					<a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+					<a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+				</div>
+			</div>
+			<div class="hamburger">
+				<span class="bar"></span>
+				<span class="bar"></span>
+				<span class="bar"></span>
+			</div>
+		</div>
+	</nav>
+
+	<section class="container" style="padding-top: 100px;">
+		<h1>Admin Dashboard</h1>
+		<p class="section-subtitle">Manage users, issues, categories, and settings</p>
+
+		<div class="stats-grid" id="statsGrid">
+			<div class="stat-item">
+				<i class="fas fa-users"></i>
+				<span class="stat-number" id="statUsers">-</span>
+				<span class="stat-label">Total Users</span>
+			</div>
+			<div class="stat-item">
+				<i class="fas fa-flag"></i>
+				<span class="stat-number" id="statIssues">-</span>
+				<span class="stat-label">Total Issues</span>
+			</div>
+			<div class="stat-item">
+				<i class="fas fa-check-circle"></i>
+				<span class="stat-number" id="statResolved">-</span>
+				<span class="stat-label">Resolved</span>
+			</div>
+			<div class="stat-item">
+				<i class="fas fa-hourglass-half"></i>
+				<span class="stat-number" id="statPending">-</span>
+				<span class="stat-label">Pending</span>
+			</div>
+		</div>
+
+		<div class="tabs">
+			<button class="tab-button active" data-tab="usersTab"><i class="fas fa-user"></i> Users</button>
+			<button class="tab-button" data-tab="issuesTab"><i class="fas fa-flag"></i> Issues</button>
+			<button class="tab-button" data-tab="categoriesTab"><i class="fas fa-tags"></i> Categories</button>
+			<button class="tab-button" data-tab="settingsTab"><i class="fas fa-gear"></i> Settings</button>
+			<button class="tab-button" data-tab="activityTab"><i class="fas fa-clipboard-list"></i> Activity</button>
+		</div>
+
+		<div class="tab-content" id="usersTab" style="display: block;">
+			<div class="table-actions">
+				<input type="text" id="userSearch" placeholder="Search users by name or email">
+			</div>
+			<div class="table-responsive">
+				<table class="data-table">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Name</th>
+							<th>Email</th>
+							<th>Role</th>
+							<th>Status</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody id="usersTableBody"></tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="tab-content" id="issuesTab">
+			<div class="table-actions">
+				<select id="issueStatusFilter">
+					<option value="">All Statuses</option>
+					<option value="reported">Reported</option>
+					<option value="investigating">Investigating</option>
+					<option value="in-progress">In Progress</option>
+					<option value="resolved">Resolved</option>
+				</select>
+				<input type="text" id="issueSearch" placeholder="Search issues">
+			</div>
+			<div class="table-responsive">
+				<table class="data-table">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Title</th>
+							<th>Status</th>
+							<th>Priority</th>
+							<th>City</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody id="issuesTableBody"></tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="tab-content" id="categoriesTab">
+			<div class="form-row">
+				<input type="text" id="newCategoryName" placeholder="New category name">
+				<input type="text" id="newCategoryDescription" placeholder="Description (optional)">
+				<button class="btn btn-primary" id="addCategoryBtn"><i class="fas fa-plus"></i> Add</button>
+			</div>
+			<div class="table-responsive" style="margin-top: 12px;">
+				<table class="data-table">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Name</th>
+							<th>Active</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody id="categoriesTableBody"></tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="tab-content" id="settingsTab">
+			<div class="form-group">
+				<label>Email Reminders Enabled</label>
+				<select id="settingEmailReminders">
+					<option value="true">Yes</option>
+					<option value="false">No</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label>Notifications Enabled</label>
+				<select id="settingNotifications">
+					<option value="true">Yes</option>
+					<option value="false">No</option>
+				</select>
+			</div>
+			<button class="btn btn-primary" id="saveSettingsBtn"><i class="fas fa-save"></i> Save Settings</button>
+		</div>
+
+		<div class="tab-content" id="activityTab">
+			<div class="table-responsive">
+				<table class="data-table">
+					<thead>
+						<tr>
+							<th>When</th>
+							<th>Admin</th>
+							<th>Action</th>
+							<th>Entity</th>
+							<th>Details</th>
+						</tr>
+					</thead>
+					<tbody id="activityTableBody"></tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+
+	<footer class="footer">
+		<div class="container">
+			<div class="footer-bottom">
+				<p>&copy; 2025 Samadhan Kendra. Admin Panel.</p>
+			</div>
+		</div>
+	</footer>
+
+	<script src="admin.js"></script>
+</body>
+</html>
