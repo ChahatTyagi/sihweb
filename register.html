@@ -295,39 +295,38 @@
             strengthText.textContent = text;
         });
 
-        // Form submission
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        // Form submission (backend)
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            
             if (password !== confirmPassword) {
                 alert('Passwords do not match!');
                 return;
             }
-            
-            // Simulate registration
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
-            
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
             submitBtn.disabled = true;
-            
-            // Simulate API call delay
-            setTimeout(() => {
-                // Store user data in localStorage
-                localStorage.setItem('userLoggedIn', 'true');
-                localStorage.setItem('userEmail', document.getElementById('email').value);
-                localStorage.setItem('userFirstName', document.getElementById('firstName').value);
-                localStorage.setItem('userLastName', document.getElementById('lastName').value);
-                localStorage.setItem('userCity', document.getElementById('city').value);
-                localStorage.setItem('userPoints', '100'); // Starting points
-                
-                // Show success message and redirect
-                alert('Account created successfully! Welcome to Samadhan Kendra.');
-                window.location.href = 'profile.html';
-            }, 2000);
+            try {
+                const body = {
+                    name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`.trim(),
+                    email: document.getElementById('email').value,
+                    password
+                };
+                const res = await fetch('http://localhost:4000/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (!res.ok) throw new Error('Registration failed');
+                alert('Account created successfully! Please login.');
+                window.location.href = 'login.html';
+            } catch (err) {
+                alert(err.message);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
     </script>
 </body>

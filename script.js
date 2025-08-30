@@ -498,6 +498,22 @@ function updateUserPoints(points) {
     userPointsElement.textContent = newPoints.toLocaleString();
 }
 
+// Add conditional Admin link in profile dropdown if admin
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const role = localStorage.getItem('role');
+        if (role === 'admin') {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown && !dropdown.querySelector('a[href="admin.html"]')) {
+                const adminLink = document.createElement('a');
+                adminLink.href = 'admin.html';
+                adminLink.innerHTML = '<i class="fas fa-shield-alt"></i> Admin Panel';
+                dropdown.prepend(adminLink);
+            }
+        }
+    } catch (e) {}
+});
+
 // Leaderboard functionality
 function displayLeaderboard(period = 'monthly') {
     const leaderboardList = document.getElementById('leaderboardList');
@@ -562,17 +578,39 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // Initialize the page
-document.addEventListener('DOMContentLoaded', function() {
-    // Display initial issues
-    displayIssues(sampleIssues);
-    
-    // Update initial stats
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const res = await fetch('http://localhost:4000/api/issues');
+        if (res.ok) {
+            const issues = await res.json();
+            if (Array.isArray(issues) && issues.length) {
+                displayIssues(issues.map(i => ({
+                    id: `SK-${i.id}`,
+                    type: i.type || 'other',
+                    priority: i.priority || 'low',
+                    title: i.title,
+                    description: i.description || '',
+                    address: i.address || '',
+                    city: i.city || '',
+                    landmark: i.landmark || '',
+                    status: i.status || 'reported',
+                    reportedDate: i.reported_date || new Date().toISOString(),
+                    contact: i.contact || '',
+                    upvotes: i.upvotes || 0,
+                    media: [],
+                    gpsLocation: i.gps_location || ''
+                })));
+            } else {
+                displayIssues(sampleIssues);
+            }
+        } else {
+            displayIssues(sampleIssues);
+        }
+    } catch (e) {
+        displayIssues(sampleIssues);
+    }
     updateStats();
-    
-    // Display initial leaderboard
     displayLeaderboard('monthly');
-    
-    // Add some animation to stats
     animateStats();
 });
 

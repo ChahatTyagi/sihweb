@@ -202,30 +202,37 @@
             }
         }
 
-        // Login form handling
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        // Login form handling (via backend)
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
-            // Simulate login process
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
-            
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
             submitBtn.disabled = true;
-            
-            // Simulate API call
-            setTimeout(() => {
-                // Store user data in localStorage (simulating successful login)
+            try {
+                const res = await fetch('http://localhost:4000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                if (!res.ok) throw new Error('Invalid credentials');
+                const data = await res.json();
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('role', data.user.role);
                 localStorage.setItem('userLoggedIn', 'true');
-                localStorage.setItem('userEmail', email);
-                localStorage.setItem('userPoints', '1250');
-                
-                // Redirect to profile page
-                window.location.href = 'profile.html';
-            }, 2000);
+                localStorage.setItem('userEmail', data.user.email);
+                if (data.user.role === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'profile.html';
+                }
+            } catch (err) {
+                alert('Login failed: ' + err.message);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
 
         // Profile dropdown toggle
